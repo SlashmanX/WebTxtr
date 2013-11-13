@@ -16,6 +16,7 @@ import com.slashmanx.webtxtr.R;
 import com.slashmanx.webtxtr.classes.SMSThread;
 
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -38,7 +39,9 @@ public class ThreadListAdapter extends ArrayAdapter<SMSThread> {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView1 = vi.inflate(R.layout.message_list_item, null);
             holder.messageTo = (TextView) convertView1.findViewById(R.id.txt_msgTO);
-            holder.messageContent = (TextView) convertView1.findViewById(R.id.txt_messageContent);
+            holder.messageCount = (TextView) convertView1.findViewById(R.id.txt_msgCount);
+            holder.messageDate = (TextView) convertView1.findViewById(R.id.txt_msgDate);
+            holder.messageContent = (TextView) convertView1.findViewById(R.id.txt_msgContent);
             holder.contactPerson = (QuickContactBadge) convertView1.findViewById(R.id.contact_person);
             convertView1.setTag(holder);
         } else {
@@ -46,16 +49,39 @@ public class ThreadListAdapter extends ArrayAdapter<SMSThread> {
         }
         SMSThread sms_thread = getItem(position);
 
-        holder.messageTo.setText(sms_thread.getPerson() + " ("+ sms_thread.getMessages().size() +")");
+        if(sms_thread.getPerson() != null) {
+            holder.messageTo.setText(sms_thread.getPerson().getName());
+        }
+        else {
+            holder.messageTo.setText(sms_thread.getAddress());
+        }
+
+        holder.messageCount.setText(sms_thread.getMessages().size() + ""); 
+        holder.messageDate.setText("12:10");
 
         holder.messageContent.setText(sms_thread.getMessages().get(sms_thread.getMessages().size() -1).getMsg());
 
+        if(sms_thread.getPerson() != null) {
+            Uri contactUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(sms_thread.getPerson().getId()));
+            InputStream photo_stream = ContactsContract.Contacts.openContactPhotoInputStream(ctx.getContentResolver(), contactUri);
+            if(photo_stream == null) {
+                holder.contactPerson.setImageResource(R.drawable.ic_contact_picture);
+            }
+            else {
+                BufferedInputStream buf = new BufferedInputStream(photo_stream);
 
-        Uri contactUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(sms_thread.getPerson()));
-        InputStream photo_stream = ContactsContract.Contacts.openContactPhotoInputStream(ctx.getContentResolver(), contactUri);
-        BufferedInputStream buf = new BufferedInputStream(photo_stream);
-        Bitmap my_btmp = BitmapFactory.decodeStream(buf);
-        holder.contactPerson.setImageBitmap(my_btmp);
+                Bitmap my_btmp = BitmapFactory.decodeStream(buf);
+                holder.contactPerson.setImageBitmap(my_btmp);
+                try {
+                    buf.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        else {
+            holder.contactPerson.setImageResource(R.drawable.ic_contact_picture);
+        }
 
         return convertView1;
     }
@@ -72,7 +98,7 @@ public class ThreadListAdapter extends ArrayAdapter<SMSThread> {
         notifyDataSetChanged();
     }
     private class Holder {
-        public TextView messageTo, messageContent;
+        public TextView messageTo, messageContent, messageCount, messageDate;
         public QuickContactBadge contactPerson;
     }
 }

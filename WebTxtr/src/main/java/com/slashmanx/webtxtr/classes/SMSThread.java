@@ -3,19 +3,29 @@ package com.slashmanx.webtxtr.classes;
 import java.util.ArrayList;
 
 public class SMSThread {
-    private int person;
+    private Person person;
+    private int id;
     private ArrayList<SMS> messages;
+    private String address;
 
     public SMSThread() {
         messages = new ArrayList<SMS>();
     }
 
-    public int getPerson() {
+    public Person getPerson() {
         return person;
     }
 
-    public void setPerson(int person) {
+    public void setPerson(Person person) {
         this.person = person;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public ArrayList<SMS> getMessages() {
@@ -28,5 +38,13 @@ public class SMSThread {
 
     public void addSMS(SMS message) {
         this.messages.add(message);
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

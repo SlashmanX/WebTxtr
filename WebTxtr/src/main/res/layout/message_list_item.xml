@@ -1,45 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout_appwid_detail_msg"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="horizontal" >
+    android:orientation="horizontal"
+    android:background="#eeeeee"
+    >
 
     <QuickContactBadge
         android:id="@+id/contact_person"
-        android:layout_height="80dp"
-        android:layout_width="80dp"
+        android:layout_height="65dp"
+        android:layout_width="65dp"
+        android:layout_marginRight="10dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/droid_small">
+        android:src="@drawable/ic_contact_picture">
     </QuickContactBadge>
     <TextView
         android:id="@+id/txt_msgTO"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:lineSpacingExtra="3dp"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:shadowColor="#FFFFFF"
-        android:shadowDy="1"
-        android:shadowRadius="0.01"
         android:singleLine="true"
-        android:textColor="#000000"
-        android:textSize="12sp"
-        android:textStyle="bold" />
+        android:textColor="#060606"
+        android:textSize="18sp"
+        android:layout_toRightOf="@+id/contact_person"/>
     <TextView
-        android:id="@+id/txt_messageContent"
-        android:layout_width="fill_parent"
+        android:id="@+id/txt_msgCount"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:lineSpacingExtra="3dp"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:shadowColor="#FFFFFF"
-        android:shadowDy="1"
-        android:shadowRadius="0.01"
+        android:paddingLeft="3dp"
         android:singleLine="true"
-        android:textColor="#000000"
-        android:textSize="12sp"
-        android:textStyle="bold" />
-</LinearLayout>
+        android:textColor="#adadad"
+        android:textSize="18sp"
+        android:layout_toRightOf="@+id/txt_msgTO"/>
+    <TextView
+        android:id="@+id/txt_msgContent"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_marginTop="8dp"
+        android:singleLine="true"
+        android:textColor="#404040"
+        android:textSize="14sp"
+        android:layout_toLeftOf="@+id/txt_msgDate"
+        android:layout_toRightOf="@+id/contact_person"
+        android:layout_below="@+id/txt_msgTO"/>
+
+    <TextView
+        android:id="@+id/txt_msgDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:singleLine="true"
+        android:textColor="#404040"
+        android:textSize="14sp"
+        android:layout_below="@+id/txt_msgTO"
+        android:layout_alignParentRight="true"/>
+</RelativeLayout>

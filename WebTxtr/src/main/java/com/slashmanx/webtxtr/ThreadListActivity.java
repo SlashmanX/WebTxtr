@@ -44,7 +44,9 @@ public class ThreadListActivity extends FragmentActivity
      * device.
      */
     private boolean mTwoPane;
+    private static final int TYPE_ALL_MESSAGE = 0;
     private static final int TYPE_INCOMING_MESSAGE = 1;
+    private static final int TYPE_OUTGOING_MESSAGE = 2;
     private ListView messageList;
     private ThreadListAdapter messageListAdapter;
     private ArrayList<SMSThread> recordsStored;
@@ -107,7 +109,7 @@ public class ThreadListActivity extends FragmentActivity
     @Override
     public void onResume() {
         super.onResume();
-        populateMessageList();
+        //populateMessageList();
     }
     private void initViews() {
         customHandler = new CustomHandler(this);
@@ -145,7 +147,7 @@ public class ThreadListActivity extends FragmentActivity
         }
         @Override
         public void run() {
-            recordsStored = fetchInboxSms(TYPE_INCOMING_MESSAGE);
+            recordsStored = fetchInboxSms(TYPE_ALL_MESSAGE);
             listInboxMessages = recordsStored;
             customHandler.sendEmptyMessage(0);
         }
@@ -156,7 +158,7 @@ public class ThreadListActivity extends FragmentActivity
         Cursor cursor = this.getContentResolver()
                 .query(uriSms,
                         new String[] { "_id", "person", "thread_id", "address", "date", "body",
-                                "type", "read" }, "type=" + type, null,
+                                "type", "read" }, null, null,
                         "date" + " COLLATE LOCALIZED DESC");
         if (cursor != null) {
             cursor.moveToLast();
@@ -179,12 +181,14 @@ public class ThreadListActivity extends FragmentActivity
                             .getColumnIndex("person")));
                     message.setThreadId(cursor.getInt(cursor
                             .getColumnIndex("thread_id")));
-                    int index = helpers.getThreadIndexByPersonId(smsInbox, message.getPerson());
-                    Log.i("INDEX", index+ "");
+                    int index = helpers.getThreadIndexByThreadId(smsInbox, message.getThreadId());
                     SMSThread t;
                     if(index == -1) {
                         t = new SMSThread();
-                        t.setPerson(message.getPerson());
+                        t.setId(message.getThreadId());
+                        t.setAddress(message.getAddress());
+                        long contactId = helpers.getPersonIDFromAddress(message.getAddress());
+                        t.setPerson(helpers.getContactInfoFromID(contactId));
                     }
                     else t = smsInbox.get(index);
                     t.addSMS(message);
