@@ -171,7 +171,7 @@ public class ThreadListActivity extends FragmentActivity
                             .getColumnIndex("body")));
                     message.setRead(cursor.getInt(cursor
                             .getColumnIndex("read")) == 1);
-                    message.setTime(cursor.getInt(cursor
+                    message.setTime(cursor.getLong(cursor
                             .getColumnIndex("date")));
                     message.setId(cursor.getString(cursor
                             .getColumnIndex("_id")));
@@ -191,12 +191,15 @@ public class ThreadListActivity extends FragmentActivity
                         t.setPerson(helpers.getContactInfoFromID(contactId));
                     }
                     else t = smsInbox.get(index);
+                    if(!message.isRead()) t.setRead(false);
                     t.addSMS(message);
                     if(index == -1) smsInbox.add(t);
                     else smsInbox.set(index, t);
                 } while (cursor.moveToPrevious());
             }
-        }  return smsInbox;
+        }
+        cursor.close();
+        return smsInbox;
     }
     private FetchMessageThread fetchMessageThread;
     private int currentCount = 0;

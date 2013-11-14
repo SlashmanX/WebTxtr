@@ -7,6 +7,7 @@ public class SMSThread {
     private int id;
     private ArrayList<SMS> messages;
     private String address;
+    private boolean read;
 
     public SMSThread() {
         messages = new ArrayList<SMS>();
@@ -40,11 +41,23 @@ public class SMSThread {
         this.messages.add(message);
     }
 
+    public SMS getLatestSMS() {
+        return this.getMessages().get(this.getMessages().size() - 1);
+    }
+
     public String getAddress() {
         return address;
     }
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
     }
 }

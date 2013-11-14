@@ -5,7 +5,7 @@ public class SMS{
     private String address;
     private String msg;
     private boolean read; //"0" for have not read sms and "1" for have read sms
-    private int time;
+    private Long time;
     private String folderName;
     private int person;
     private int threadId;
@@ -22,7 +22,7 @@ public class SMS{
     public boolean isRead(){
         return this.read;
     }
-    public int getTime(){
+    public Long getTime(){
         return this.time;
     }
     public String getFolderName(){
@@ -47,7 +47,7 @@ public class SMS{
     public void setRead(boolean read){
         this.read = read;
     }
-    public void setTime(int time){
+    public void setTime(Long time){
         this.time = time;
     }
     public void setFolderName(String folderName){

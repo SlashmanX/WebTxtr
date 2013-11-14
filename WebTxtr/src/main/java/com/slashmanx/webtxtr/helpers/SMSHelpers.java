@@ -7,7 +7,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
-import android.util.Log;
 
 import com.slashmanx.webtxtr.classes.Person;
 import com.slashmanx.webtxtr.classes.SMSThread;
@@ -25,7 +24,6 @@ public class SMSHelpers {
     }
 
     public int getThreadIndexByPersonId(ArrayList<SMSThread> threads, int person_id) {
-        Log.d("Looking", "Person: "+ person_id);
         for(SMSThread t : threads) {
             if(t.getPerson() != null && t.getPerson().getId()  == person_id) return threads.indexOf(t);
         }
@@ -47,12 +45,10 @@ public class SMSHelpers {
         if(cursor != null) {
             if (cursor.moveToFirst()) {
                 personID =  cursor.getLong(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID));
-                Log.v("WebTxtr", "Started uploadcontactphoto: Contact Found @ " + personID);
-            } else {
-                Log.v("WebTextr", "Contact Not Found @ " + address);
             }
-            cursor.close();
         }
+
+        cursor.close();
         return personID;
     }
     public Person getContactInfoFromID(long contact_id) {
@@ -96,9 +92,9 @@ public class SMSHelpers {
                     phoneCursor.close();
                 }
             }
-            cursor.close();
 
         }
+        cursor.close();
         return p;
     }
 

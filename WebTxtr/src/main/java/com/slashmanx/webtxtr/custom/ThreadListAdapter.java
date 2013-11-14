@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.text.format.DateUtils;
+import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +15,18 @@ import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
 import com.slashmanx.webtxtr.R;
+import com.slashmanx.webtxtr.classes.SMS;
 import com.slashmanx.webtxtr.classes.SMSThread;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 
 public class ThreadListAdapter extends ArrayAdapter<SMSThread> {
 
@@ -56,10 +64,21 @@ public class ThreadListAdapter extends ArrayAdapter<SMSThread> {
             holder.messageTo.setText(sms_thread.getAddress());
         }
 
-        holder.messageCount.setText(sms_thread.getMessages().size() + ""); 
-        holder.messageDate.setText("12:10");
+        holder.messageCount.setText(sms_thread.getMessages().size() + "");
 
-        holder.messageContent.setText(sms_thread.getMessages().get(sms_thread.getMessages().size() -1).getMsg());
+        SMS latestMessage;
+        latestMessage = sms_thread.getLatestSMS();
+        String formattedDate = DateUtils.formatSameDayTime(latestMessage.getTime(), new Date().getTime(), SimpleDateFormat.DEFAULT, DateFormat.SHORT).toString();
+
+        Time today = new Time(Time.getCurrentTimezone());
+        today.setToNow();
+        if(formattedDate.endsWith("" + today.year)) {
+            formattedDate = formattedDate.replace(""+ today.year, "");
+        }
+        holder.messageDate.setText(formattedDate);
+
+
+        holder.messageContent.setText(latestMessage.getMsg());
 
         if(sms_thread.getPerson() != null) {
             Uri contactUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(sms_thread.getPerson().getId()));
@@ -78,6 +97,10 @@ public class ThreadListAdapter extends ArrayAdapter<SMSThread> {
                     e.printStackTrace();
                 }
             }
+
+
+            holder.contactPerson.assignContactUri(contactUri);
+            holder.contactPerson.setMode(ContactsContract.QuickContact.MODE_MEDIUM);
         }
         else {
             holder.contactPerson.setImageResource(R.drawable.ic_contact_picture);
@@ -85,6 +108,12 @@ public class ThreadListAdapter extends ArrayAdapter<SMSThread> {
 
         return convertView1;
     }
+
+    final private Comparator<SMSThread> comp = new Comparator<SMSThread>() {
+        public int compare(SMSThread e1, SMSThread e2) {
+            return e2.getLatestSMS().getTime().compareTo(e1.getLatestSMS().getTime());
+        }
+    };
     @Override
     public int getCount() {
         return threadListArray.size();
@@ -94,6 +123,7 @@ public class ThreadListAdapter extends ArrayAdapter<SMSThread> {
         return threadListArray.get(position);
     }
     public void setArrayList(ArrayList<SMSThread> threadList) {
+        Collections.sort(threadList, comp);
         this.threadListArray = threadList;
         notifyDataSetChanged();
     }
