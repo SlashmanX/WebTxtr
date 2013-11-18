@@ -99,6 +99,7 @@ public class SMSHelpers {
     }
 
     public int getThreadIndexByThreadId(ArrayList<SMSThread> threads, int thread_id) {
+        if(thread_id == -1) return -1;
         for(SMSThread t : threads) {
             if(t.getId() == thread_id) return threads.indexOf(t);
         }

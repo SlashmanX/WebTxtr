@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.slashmanx.webtxtr.R;
 import com.slashmanx.webtxtr.classes.SMS;
 import com.slashmanx.webtxtr.classes.SMSThread;
+import com.slashmanx.webtxtr.helpers.SMSHelpers;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -32,10 +33,12 @@ public class ThreadListAdapter extends ArrayAdapter<SMSThread> {
 
     private Context ctx;
     public ArrayList<SMSThread> threadListArray;
+    public SMSHelpers helpers;
     public ThreadListAdapter(Context context, int textViewResourceId, ArrayList<SMSThread> threadListArray) {
         super(context, textViewResourceId);
         this.threadListArray = threadListArray;
         this.ctx = context;
+        this.helpers = new SMSHelpers(null, ctx);
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -125,6 +128,30 @@ public class ThreadListAdapter extends ArrayAdapter<SMSThread> {
     public void setArrayList(ArrayList<SMSThread> threadList) {
         Collections.sort(threadList, comp);
         this.threadListArray = threadList;
+        notifyDataSetChanged();
+    }
+    public void addSMS(SMS msg) {
+        int thread_id = msg.getThreadId();
+        boolean found = false;
+        for(SMSThread t: this.threadListArray) {
+            if(t.getId() == thread_id) {
+                found = true;
+                t.addSMS(msg);
+            }
+
+        }
+        if(!found) {
+            SMSThread t = new SMSThread();
+            t.setAddress(msg.getAddress());
+            t.setId(msg.getThreadId());
+            long contactId = helpers.getPersonIDFromAddress(msg.getAddress());
+            t.setPerson(helpers.getContactInfoFromID(contactId));
+            t.setRead(msg.isRead());
+            t.addSMS(msg);
+
+            this.threadListArray.add(t);
+        }
+        Collections.sort(this.threadListArray, comp);
         notifyDataSetChanged();
     }
     private class Holder {

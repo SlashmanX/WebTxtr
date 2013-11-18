@@ -1,5 +1,6 @@
 package com.slashmanx.webtxtr;
 
+import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,7 +10,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.slashmanx.webtxtr.classes.SMS;
 import com.slashmanx.webtxtr.classes.SMSThread;
@@ -54,6 +61,8 @@ public class ThreadListActivity extends FragmentActivity
     private ProgressDialog progressDialogInbox;
     private CustomHandler customHandler;
     private SMSHelpers helpers;
+    private int unreadConvoCount;
+    private TextView unreadConvoCountView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +84,7 @@ public class ThreadListActivity extends FragmentActivity
                     .findFragmentById(R.id.thread_list))
                     .setActivateOnItemClick(true);
         }
+        setupActionBar();
 
         // TODO: If exposing deep links into your app, handle intents here.
     }
@@ -110,6 +120,23 @@ public class ThreadListActivity extends FragmentActivity
     public void onResume() {
         super.onResume();
         //populateMessageList();
+    }
+
+    public void setUnreadCount() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int unreadCount = 0;
+                for(SMSThread t : listInboxMessages) {
+                    if(!t.isRead()) unreadCount++;
+                }
+                if(unreadCount > 0)
+                    unreadConvoCountView.setText(""+ unreadCount);
+                else
+                    unreadConvoCountView.setText("");
+            }
+        });
+
     }
     private void initViews() {
         customHandler = new CustomHandler(this);
@@ -150,6 +177,7 @@ public class ThreadListActivity extends FragmentActivity
             recordsStored = fetchInboxSms(TYPE_ALL_MESSAGE);
             listInboxMessages = recordsStored;
             customHandler.sendEmptyMessage(0);
+            setUnreadCount();
         }
     }
     public ArrayList<SMSThread> fetchInboxSms(int type) {
@@ -183,8 +211,12 @@ public class ThreadListActivity extends FragmentActivity
                             .getColumnIndex("thread_id")));
                     int index = helpers.getThreadIndexByThreadId(smsInbox, message.getThreadId());
                     SMSThread t;
-                    if(index == -1) {
+                    if(index == -1) { // Not found by thread id, try by person
+                        index = helpers.getThreadIndexByPersonId(smsInbox, message.getPerson());
+                    }
+                    if(index == -1) { // Still not found, make new thread
                         t = new SMSThread();
+                        t.setRead(true);
                         t.setId(message.getThreadId());
                         t.setAddress(message.getAddress());
                         long contactId = helpers.getPersonIDFromAddress(message.getAddress());
@@ -243,4 +275,26 @@ public class ThreadListActivity extends FragmentActivity
             stopThread();
         }
     };
+
+    private void setupActionBar() {
+        ActionBar actionBar = getActionBar();
+
+        ViewGroup v = (ViewGroup) LayoutInflater.from(this)
+                .inflate(R.layout.unread_thread_count, null);
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
+                ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setCustomView(v,
+                new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,
+                        ActionBar.LayoutParams.WRAP_CONTENT,
+                        Gravity.CENTER_VERTICAL | Gravity.RIGHT));
+
+        unreadConvoCountView = (TextView)v.findViewById(R.id.unread_convo_count);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.home_action_bar, menu);
+        return true;
+    }
 }
