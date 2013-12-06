@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -295,6 +296,20 @@ public class ThreadListActivity extends FragmentActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.home_action_bar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_settings:
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
+                break;
+
+        }
+
         return true;
     }
 }

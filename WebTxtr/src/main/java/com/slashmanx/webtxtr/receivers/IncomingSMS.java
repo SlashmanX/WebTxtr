@@ -6,7 +6,9 @@ import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsMessage;
 
@@ -48,12 +50,13 @@ public class IncomingSMS extends BroadcastReceiver {
                 sms.setThreadId(-1);
                 messages.add(sms);
             }
-
-            if(messages.size() > 0) {
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+            Boolean showNotification = sharedPref.getBoolean("pref_key_show_notification", false);
+            if(messages.size() > 0 && showNotification) {
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(context)
                                 .setSmallIcon(R.drawable.ic_launcher)
-                                .setContentTitle("WebTxtr Msg")
+                                .setContentTitle(helpers.getContactInfoFromID(messages.get(0).getPerson()).getName())
                                 .setContentText(messages.get(0).getMsg());
 // Creates an explicit intent for an Activity in your app
                 Intent resultIntent = new Intent(context, ThreadListActivity.class);
